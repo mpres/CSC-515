@@ -24,7 +24,7 @@ cv.putText(
     lineType=cv.LINE_AA
 )
 
-#Step 6: show image with red rectangle
-cv.imshow("Image with Red box", face_img)
-cv.waitKey(0)
-cv.destroyAllWindows()
+#Step 6: Save image
+cv.imwrite("front_face_with_annotation.jpg", face_img)
+
+
