@@ -4,7 +4,7 @@ import os
 # -----------------------------
 # Configuration
 # -----------------------------
-image_path = "input.jpg"        # <-- change this
+image_path = "blurry_image.jpg"        # <-- change this
 output_dir = "blurred_results"
 os.makedirs(output_dir, exist_ok=True)
 
