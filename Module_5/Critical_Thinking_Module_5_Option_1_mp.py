@@ -22,7 +22,7 @@ save_and_show(img_gray, "1_original")
 
 # Step 1: Aggressive Noise Reduction FIRST (before CLAHE)
 # Non-local Means Denoising - excellent for this type of noise
-img_denoised = cv2.fastNlMeansDenoising(img_gray, None, h=12, templateWindowSize=7, searchWindowSize=21)
+img_denoised = cv2.fastNlMeansDenoising(img_gray, None, h=14, templateWindowSize=7, searchWindowSize=21)
 save_and_show(img_denoised, "2_denoised")
 
 # Step 2: Bilateral Filter - preserves edges while smoothing
