@@ -1,3 +1,4 @@
 import cv2 as cv
 
-print("hello")
+#cv.imread("img_contrast_1.jp")
+
