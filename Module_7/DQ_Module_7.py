@@ -51,7 +51,16 @@ laplacian_edges = np.uint8(np.clip(np.abs(laplacian_edges), 0, 255))
 
 
 # --- Display the image ---
-cv2.imshow("Filled Square", image)
+# --- Display all results ---
+cv2.imshow("Original",          image)
+cv2.waitKey(0)        # Wait until a key is pressed
+cv2.imshow("Grayscale",         gray)
+cv2.waitKey(0)        # Wait until a key is pressed
+cv2.imshow("Canny Edges",       canny_edges)
+cv2.waitKey(0)        # Wait until a key is pressed
+cv2.imshow("Sobel Edges",       sobel_edges)
+cv2.waitKey(0)        # Wait until a key is pressed
+cv2.imshow("Laplacian Edges",   laplacian_edges)
 cv2.waitKey(0)        # Wait until a key is pressed
 cv2.destroyAllWindows()
 
