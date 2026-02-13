@@ -140,7 +140,7 @@ cv2.circle(image, CENTER, RADIUS, CIRCLE_COLOR, THICKNESS)
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 #. Use canny
-canny_edges = cv2.Canny(gray, threshold1=50, threshold2=150)
+canny_edges = cv2.Canny(gray, threshold1=100, threshold2=200)
 
 #.# --- Sobel ---
 # Calculates the gradient (rate of change) in X and Y directions
@@ -154,3 +154,30 @@ sobel_edges = np.uint8(np.clip(sobel_combined, 0, 255))
 # Detects edges by looking for rapid changes in all directions at once
 laplacian_edges = cv2.Laplacian(gray, cv2.CV_64F)
 laplacian_edges = np.uint8(np.clip(np.abs(laplacian_edges), 0, 255))
+
+# --- Run evaluation ---
+gt = make_ground_truth()
+
+p, r, f1 = evaluate(canny_edges, gt)
+print(f"Canny     — Precision: {p}  Recall: {r}  F1: {f1}")
+
+p, r, f1 = evaluate(sobel_edges, gt)
+print(f"Sobel     — Precision: {p}  Recall: {r}  F1: {f1}")
+
+p, r, f1 = evaluate(laplacian_edges, gt)
+print(f"Laplacian — Precision: {p}  Recall: {r}  F1: {f1}")
+
+
+# --- Display the image ---
+# --- Display all results ---
+cv2.imshow("Original",          image)
+cv2.waitKey(0)        # Wait until a key is pressed
+cv2.imshow("Grayscale",         gray)
+cv2.waitKey(0)        # Wait until a key is pressed
+cv2.imshow("Canny Edges",       canny_edges)
+cv2.waitKey(0)        # Wait until a key is pressed
+cv2.imshow("Sobel Edges",       sobel_edges)
+cv2.waitKey(0)        # Wait until a key is pressed
+cv2.imshow("Laplacian Edges",   laplacian_edges)
+cv2.waitKey(0)        # Wait until a key is pressed
+cv2.destroyAllWindows()
