@@ -14,9 +14,18 @@ SQUARE_BOTTOM_RIGHT = (150, 150)
 SQUARE_COLOR = (0, 255, 0)       # Green square
 THICKNESS = -1                    # -1 = filled
 
+# Circle settings
+CENTER = (250, 250)
+RADIUS = 50
+CIRCLE_COLOR = (0, 0, 255)       # Green square
+
+
 
 # --- Draw filled square ---
 cv2.rectangle(image, SQUARE_TOP_LEFT, SQUARE_BOTTOM_RIGHT, SQUARE_COLOR, THICKNESS)
+
+# --- Draw filled --- circle
+cv2.circle(image, CENTER, RADIUS, CIRCLE_COLOR, THICKNESS)
 
 
 
