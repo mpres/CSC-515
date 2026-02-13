@@ -91,7 +91,6 @@ def random_bgr():
 
 
 
-
 # --- Run evaluation ---
 gt = make_ground_truth()
 
@@ -118,6 +117,13 @@ cv2.waitKey(0)        # Wait until a key is pressed
 cv2.imshow("Laplacian Edges",   laplacian_edges)
 cv2.waitKey(0)        # Wait until a key is pressed
 cv2.destroyAllWindows()
+
+#Save files
+cv2.imwrite("Original.png", image)
+cv2.imwrite("Grayscale.png", gray)
+cv2.imwrite("Canny.png", canny_edges)
+cv2.imwrite("Sobel.png", sobel_edges)
+cv2.imwrite("Laplacian.png", laplacian_edges)
 
 
 # Rerun analysis with random color values
@@ -181,3 +187,11 @@ cv2.waitKey(0)        # Wait until a key is pressed
 cv2.imshow("Laplacian Edges",   laplacian_edges)
 cv2.waitKey(0)        # Wait until a key is pressed
 cv2.destroyAllWindows()
+
+
+#Save files
+cv2.imwrite("Original_Random.png", image)
+cv2.imwrite("Grayscale_Random.png", gray)
+cv2.imwrite("Canny_Random.png", canny_edges)
+cv2.imwrite("Sobel_Random.png", sobel_edges)
+cv2.imwrite("Laplacian_Random.png", laplacian_edges)
