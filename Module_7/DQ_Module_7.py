@@ -64,7 +64,6 @@ def make_ground_truth():
     return gt
 
 
-
 def evaluate(detected, ground_truth):
     # Convert to binary (True/False) for comparison
     det = detected > 0
