@@ -146,7 +146,7 @@ cv2.circle(image, CENTER, RADIUS, CIRCLE_COLOR, THICKNESS)
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 #. Use canny
-canny_edges = cv2.Canny(gray, threshold1=100, threshold2=200)
+canny_edges = cv2.Canny(gray, threshold1=20, threshold2=30)
 
 #.# --- Sobel ---
 # Calculates the gradient (rate of change) in X and Y directions
@@ -165,13 +165,13 @@ laplacian_edges = np.uint8(np.clip(np.abs(laplacian_edges), 0, 255))
 gt = make_ground_truth()
 
 p, r, f1 = evaluate(canny_edges, gt)
-print(f"Canny     — Precision: {p}  Recall: {r}  F1: {f1}")
+print(f"Canny thresh - 20-40 Random  — Precision: {p}  Recall: {r}  F1: {f1}")
 
 p, r, f1 = evaluate(sobel_edges, gt)
-print(f"Sobel     — Precision: {p}  Recall: {r}  F1: {f1}")
+print(f"Sobel Random    — Precision: {p}  Recall: {r}  F1: {f1}")
 
 p, r, f1 = evaluate(laplacian_edges, gt)
-print(f"Laplacian — Precision: {p}  Recall: {r}  F1: {f1}")
+print(f"Laplacian Random — Precision: {p}  Recall: {r}  F1: {f1}")
 
 
 # --- Display the image ---
