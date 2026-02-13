@@ -79,6 +79,19 @@ def evaluate(detected, ground_truth):
 
     return round(precision, 3), round(recall, 3), round(f1, 3)
 
+# --- Run evaluation ---
+gt = make_ground_truth()
+
+p, r, f1 = evaluate(canny_edges, gt)
+print(f"Canny     — Precision: {p}  Recall: {r}  F1: {f1}")
+
+p, r, f1 = evaluate(sobel_edges, gt)
+print(f"Sobel     — Precision: {p}  Recall: {r}  F1: {f1}")
+
+p, r, f1 = evaluate(laplacian_edges, gt)
+print(f"Laplacian — Precision: {p}  Recall: {r}  F1: {f1}")
+
+
 
 # --- Display the image ---
 # --- Display all results ---
