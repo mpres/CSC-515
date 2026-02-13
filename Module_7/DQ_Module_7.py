@@ -48,6 +48,37 @@ sobel_edges = np.uint8(np.clip(sobel_combined, 0, 255))
 laplacian_edges = cv2.Laplacian(gray, cv2.CV_64F)
 laplacian_edges = np.uint8(np.clip(np.abs(laplacian_edges), 0, 255))
 
+# ─────────────────────────────────────────────
+# GROUND TRUTH
+# Draw just the outlines of our shapes onto a
+# blank black image — this is our "perfect" edge map
+# ─────────────────────────────────────────────
+def make_ground_truth():
+    gt = np.zeros((IMG_HEIGHT, IMG_WIDTH), dtype=np.uint8)
+    cv2.rectangle(gt, SQUARE_TOP_LEFT, SQUARE_BOTTOM_RIGHT, 255, 1)  # outline only
+    cv2.circle(gt, CENTER, RADIUS, 255, 1)                           # outline only
+
+    # Dilate slightly so we allow 1-2px tolerance in detection
+    kernel = np.ones((3, 3), np.uint8)
+    gt = cv2.dilate(gt, kernel, iterations=1)
+    return gt
+
+
+
+def evaluate(detected, ground_truth):
+    # Convert to binary (True/False) for comparison
+    det = detected > 0
+    gt  = ground_truth > 0
+
+    TP = np.sum(det & gt)   # correctly detected edges
+    FP = np.sum(det & ~gt)  # detected something that isn't an edge
+    FN = np.sum(~det & gt)  # missed a real edge
+
+    precision = TP / (TP + FP + 1e-8)  # 1e-8 avoids division by zero
+    recall    = TP / (TP + FN + 1e-8)
+    f1        = 2 * precision * recall / (precision + recall + 1e-8)
+
+    return round(precision, 3), round(recall, 3), round(f1, 3)
 
 
 # --- Display the image ---
