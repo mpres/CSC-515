@@ -8,8 +8,10 @@ import numpy as np
 import pytesseract
 from pathlib import Path
 
-SCALE_FACTOR = 1.25
-MIN_NEIGHBORS = 3
+pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
+
+SCALE_FACTOR = 1.2
+MIN_NEIGHBORS = 5
 
 
 # Paths for Models
@@ -144,7 +146,6 @@ def ocr_plate(roi_processed):
 
 
 
-
 #Get basic image
 
 img_path = Path(IMAGES["russian_upclose"])
@@ -160,14 +161,20 @@ else:
         cv2.imshow("Result_roi", roi['roi_gray'])
         cv2.waitKey(0)
 
-        desc, angle = deskew_and_align(roi_gray)
-        cv2.imshow("Result_desc", desc)
-        cv2.waitKey(0)
-
-        processed_img = preprocess_gray(desc)
+        processed_img = preprocess_gray(roi_gray)
         cv2.imshow("Result_desc", processed_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+        desc, angle = deskew_and_align(processed_img)
+        cv2.imshow("Result_desc", desc)
+        cv2.waitKey(0)
+
+        text, binary =  ocr_plate(desc)
+        cv2.imshow("binary", binary)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        print('test',text)
 
 
 
@@ -186,14 +193,21 @@ else:
         cv2.imshow("Result_roi", roi['roi_gray'])
         cv2.waitKey(0)
 
-        desc, angle = deskew_and_align(roi_gray)
-        cv2.imshow("Result_desc", desc)
-        cv2.waitKey(0)
-
-        processed_img = preprocess_gray(desc)
+        processed_img = preprocess_gray(roi_gray)
         cv2.imshow("Result_desc", processed_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+        desc, angle = deskew_and_align(processed_img)
+        cv2.imshow("Result_desc", desc)
+        cv2.waitKey(0)
+
+        text, binary =  ocr_plate(desc)
+        cv2.imshow("binary", binary)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        print('test',text)
+
 
 
 #european_plate
@@ -211,13 +225,19 @@ else:
         cv2.imshow("Result_roi", roi['roi_gray'])
         cv2.waitKey(0)
 
-        desc, angle = deskew_and_align(roi_gray)
-        cv2.imshow("Result_desc", desc)
-        cv2.waitKey(0)
-
-        processed_img = preprocess_gray(desc)
+        processed_img = preprocess_gray(roi_gray)
         cv2.imshow("Result_desc", processed_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+        desc, angle = deskew_and_align(processed_img)
+        cv2.imshow("Result_desc", desc)
+        cv2.waitKey(0)
+
+        text, binary =  ocr_plate(desc)
+        cv2.imshow("binary", binary)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        print('test',text)
 
 
