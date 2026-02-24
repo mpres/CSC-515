@@ -29,7 +29,16 @@ if cascade_rus.empty() or cascade_num.empty():
 
 print("Cascade classifiers loaded")
 
+# create output file
 
-# ─── Helper: CLAHE Preprocessing ─────────────────────────────────────────────
+OUTPUT_DIR = Path("/Outputs")
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-print(IMAGES['non_russian_multi'])
+
+#Get basic image
+
+img_path = Path(IMAGES["russian_upclose"])
+img_color = cv2.imread(img_path)
+
+if img_color is None:
+        print(f"  ERROR: Could not read {img_path}")
