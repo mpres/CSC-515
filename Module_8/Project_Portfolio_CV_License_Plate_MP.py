@@ -38,8 +38,6 @@ print("Cascade classifiers loaded")
 # create output file
 
 
-
-
 OUTPUT_DIR = Path("Outputs/")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -61,7 +59,30 @@ def detect_license_plate(img, model=cascade_rus, scale_factor=SCALE_FACTOR, min_
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    return detection_img, (x, y, w, h)
+    return detection_img, plates
+
+def extract_roi(img_color, gray, plates, pad=6):
+    """
+    Extract padded color and grayscale ROI crops for each detected plate.
+    Returns a list of dicts with keys: plate_idx, bbox, roi_color, roi_gray.
+    """
+    img_height, img_width = gray.shape[:2]
+    rois = []
+
+    for i, (x, y, w, h) in enumerate(plates):
+        x1 = max(0, x - pad)
+        y1 = max(0, y - pad)
+        x2 = min(img_width,  x + w + pad)
+        y2 = min(img_height, y + h + pad)
+
+        rois.append({
+            "plate_idx" : i + 1,
+            "bbox"      : (x, y, w, h),
+            "roi_color" : img_color[y1:y2, x1:x2],
+            "roi_gray"  : gray[y1:y2, x1:x2],
+        })
+
+    return rois
 
 
 
@@ -74,7 +95,9 @@ img_color = cv2.imread(img_path)
 if img_color is None:
         print(f"  ERROR: Could not read {img_path}")
 else:
-    detection_img = detect_license_plate(img_color)[0]
+    detection_img, plates = detect_license_plate(img_color)
+
+
 
 #Get Russian car plates faraway
 
@@ -84,7 +107,8 @@ img_color = cv2.imread(img_path)
 if img_color is None:
         print(f"  ERROR: Could not read {img_path}")
 else:
-    detection_img = detect_license_plate(img_color)[0]
+    detection_img, coordinates = detect_license_plate(img_color)
+    print("coordinates", coordinates)
 
 
 #european_plate
@@ -95,4 +119,5 @@ img_color = cv2.imread(img_path)
 if img_color is None:
         print(f"  ERROR: Could not read {img_path}")
 else:
-    detection_img = detect_license_plate(img_color)[0]
+    detection_img, coordinates = detect_license_plate(img_color)
+    print("coordinates", coordinates)
