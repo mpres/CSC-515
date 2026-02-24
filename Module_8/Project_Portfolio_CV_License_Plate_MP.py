@@ -126,6 +126,25 @@ def preprocess_gray(gray):
     enhanced = clahe.apply(denoised)
     return enhanced
 
+def ocr_plate(roi_processed):
+    """
+    Additional binarisation before Tesseract for cleaner results.
+    """
+    # Sharpen
+    kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+    sharpened = cv2.filter2D(roi_processed, -1, kernel)
+
+    # Otsu binarisation
+    _, binary = cv2.threshold(sharpened, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    # Tesseract config: single line, alphanumeric + Cyrillic-like chars
+    config = r"--oem 3 --psm 7 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789АВЕКМНОРСТУХ"
+    text = pytesseract.image_to_string(binary, config=config).strip()
+    return text, binary
+
+
+
+
 #Get basic image
 
 img_path = Path(IMAGES["russian_upclose"])
@@ -140,8 +159,13 @@ else:
         roi_gray = roi['roi_gray']
         cv2.imshow("Result_roi", roi['roi_gray'])
         cv2.waitKey(0)
+
         desc, angle = deskew_and_align(roi_gray)
         cv2.imshow("Result_desc", desc)
+        cv2.waitKey(0)
+
+        processed_img = preprocess_gray(desc)
+        cv2.imshow("Result_desc", processed_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -161,8 +185,13 @@ else:
         roi_gray = roi['roi_gray']
         cv2.imshow("Result_roi", roi['roi_gray'])
         cv2.waitKey(0)
+
         desc, angle = deskew_and_align(roi_gray)
         cv2.imshow("Result_desc", desc)
+        cv2.waitKey(0)
+
+        processed_img = preprocess_gray(desc)
+        cv2.imshow("Result_desc", processed_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -181,8 +210,13 @@ else:
         roi_gray = roi['roi_gray']
         cv2.imshow("Result_roi", roi['roi_gray'])
         cv2.waitKey(0)
+
         desc, angle = deskew_and_align(roi_gray)
         cv2.imshow("Result_desc", desc)
+        cv2.waitKey(0)
+
+        processed_img = preprocess_gray(desc)
+        cv2.imshow("Result_desc", processed_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
