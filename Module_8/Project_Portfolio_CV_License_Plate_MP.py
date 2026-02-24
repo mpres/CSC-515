@@ -114,6 +114,17 @@ def deskew_and_align(roi_gray):
     scaled = cv2.resize(rotated, (520, 110), interpolation=cv2.INTER_LANCZOS4)
     return scaled, angle
 
+def preprocess_gray(gray):
+    """
+    Apply CLAHE for contrast enhancement + bilateral filter to suppress noise
+    while preserving edges. Returns processed grayscale.
+    """
+    # Bilateral filter: preserves edges, reduces noise
+    denoised = cv2.bilateralFilter(gray, d=11, sigmaColor=75, sigmaSpace=75)
+    # CLAHE: adaptive histogram equalization for varying illumination
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+    enhanced = clahe.apply(denoised)
+    return enhanced
 
 #Get basic image
 
