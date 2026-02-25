@@ -11,7 +11,7 @@ SCALE_FACTOR  = 1.2
 MIN_NEIGHBORS = 5
 
 # Initialize EasyOCR once — loading the model is expensive, do it outside functions
-reader = easyocr.Reader(['en'])
+reader = easyocr.Reader(['en','ru'])
 
 BASE_DIR = Path(__file__).parent
 
@@ -94,30 +94,38 @@ def extract_roi(img_color, plates, pad=6):
 
 def deskew_and_align(roi_gray):
     """
-    Detect tilt angle and apply only small corrections (-15 to 15 degrees).
-    Scale to standard plate size for OCR.
+    Use Hough line detection to find the true horizontal angle of the plate
+    and apply only the necessary correction.
     """
-    _, thresh = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Edge detection
+    edges = cv2.Canny(roi_gray, 50, 150, apertureSize=3)
+
+    # Detect lines using Hough transform
+    lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold=80)
 
     angle = 0.0
-    if contours:
-        all_pts = np.vstack(contours)
-        rect    = cv2.minAreaRect(all_pts)
-        angle   = rect[2]
+    if lines is not None:
+        angles = []
+        for line in lines:
+            rho, theta = line[0]
+            # Convert to degrees and filter to near-horizontal lines only (-20 to 20 degrees)
+            angle_deg = np.degrees(theta) - 90
+            if -20 <= angle_deg <= 20:
+                angles.append(angle_deg)
 
-        # Map angle from [-90, 0) to [-45, 45)
-        if angle < -45:
-            angle += 90
+        # Use median angle to avoid outliers throwing off the correction
+        if angles:
+            angle = np.median(angles)
 
-        # Clamp to small correction range — prevents over-rotation
-        angle = max(-15, min(15, angle))
-
-    h, w = roi_gray.shape
-    M       = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
-    rotated = cv2.warpAffine(roi_gray, M, (w, h),
-                             flags=cv2.INTER_CUBIC,
-                             borderMode=cv2.BORDER_REPLICATE)
+    # Only rotate if correction is meaningful (more than 0.5 degrees)
+    if abs(angle) > 0.5:
+        h, w = roi_gray.shape
+        M       = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
+        rotated = cv2.warpAffine(roi_gray, M, (w, h),
+                                 flags=cv2.INTER_CUBIC,
+                                 borderMode=cv2.BORDER_REPLICATE)
+    else:
+        rotated = roi_gray
 
     scaled = cv2.resize(rotated, (520, 110), interpolation=cv2.INTER_LANCZOS4)
     return scaled, angle
@@ -147,8 +155,9 @@ def ocr_plate(roi_processed):
         maxValue=255,
         adaptiveMethod=cv2.ADAPTIVE_THRESH_MEAN_C,
         thresholdType=cv2.THRESH_BINARY,
-        blockSize=15,
-        C=9
+        blockSize=25,
+        C=13
+
     )
 
     # EasyOCR expects a 3-channel image
@@ -200,6 +209,8 @@ def process_image(img_path_key):
         cv2.imshow("Binary", binary)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+
 
         print(f"  Plate #{roi['plate_idx']} | angle={angle:.1f}° | OCR: '{text}'")
 
