@@ -13,23 +13,24 @@ MIN_NEIGHBORS = 5
 # Initialize EasyOCR once — loading the model is expensive, do it outside functions
 reader = easyocr.Reader(['en'])
 
-# Paths for Models
-CASCADE_PLATE_RUS = "Models/haarcascade_license_plate_rus_16stages.xml"
-CASCADE_PLATE_NUM = "Models/haarcascade_russian_plate_number.xml"
+BASE_DIR = Path(__file__).parent
 
-# Load Cascade Models
+CASCADE_PLATE_RUS = str(BASE_DIR / "Models" / "haarcascade_license_plate_rus_16stages.xml")
+CASCADE_PLATE_NUM = str(BASE_DIR / "Models" / "haarcascade_russian_plate_number.xml")
+
+# 1. Load
 cascade_rus = cv2.CascadeClassifier(CASCADE_PLATE_RUS)
 cascade_num = cv2.CascadeClassifier(CASCADE_PLATE_NUM)
 
-# Images
+# 1.5 get image paths
 IMAGES = {
-    "non_russian_multi": "images/license_plates_non_russian.jpg",
-    "russian_multi_far": "images/Russian_Multi_far.png",
-    "russian_upclose":   "images/Russian_License_Upclose.jpg",
-    "european_plate":    "images/European_plate.jpg",
+    "non_russian_multi": str(BASE_DIR / "images" / "license_plates_non_russian.jpg"),
+    "russian_multi_far": str(BASE_DIR / "images" / "Russian_Multi_far.png"),
+    "russian_upclose":   str(BASE_DIR / "images" / "Russian_License_Upclose.jpg"),
+    "european_plate":    str(BASE_DIR / "images" / "European_plate.jpg"),
 }
 
-# Check models loaded
+# 2. Then check
 if cascade_rus.empty() or cascade_num.empty():
     raise RuntimeError("Failed to load cascade classifiers!")
 
@@ -40,7 +41,7 @@ OUTPUT_DIR = Path(__file__).parent / "Outputs"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def detect_license_plate(img, model=cascade_rus, scale_factor=SCALE_FACTOR, min_neighbors=MIN_NEIGHBORS):
+def detect_license_plate(img, model=cascade_num, scale_factor=SCALE_FACTOR, min_neighbors=MIN_NEIGHBORS):
     """Detect license plates and draw red bounding boxes on a copy of the image."""
     detection_img = img.copy()
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -93,7 +94,7 @@ def extract_roi(img_color, plates, pad=6):
 
 def deskew_and_align(roi_gray):
     """
-    Detect tilt angle via minAreaRect and rotate to horizontal.
+    Detect tilt angle and apply only small corrections (-15 to 15 degrees).
     Scale to standard plate size for OCR.
     """
     _, thresh = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -104,8 +105,13 @@ def deskew_and_align(roi_gray):
         all_pts = np.vstack(contours)
         rect    = cv2.minAreaRect(all_pts)
         angle   = rect[2]
+
+        # Map angle from [-90, 0) to [-45, 45)
         if angle < -45:
             angle += 90
+
+        # Clamp to small correction range — prevents over-rotation
+        angle = max(-15, min(15, angle))
 
     h, w = roi_gray.shape
     M       = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
@@ -113,7 +119,7 @@ def deskew_and_align(roi_gray):
                              flags=cv2.INTER_CUBIC,
                              borderMode=cv2.BORDER_REPLICATE)
 
-    scaled = cv2.resize(rotated, (640, 160), interpolation=cv2.INTER_LANCZOS4)
+    scaled = cv2.resize(rotated, (520, 110), interpolation=cv2.INTER_LANCZOS4)
     return scaled, angle
 
 
