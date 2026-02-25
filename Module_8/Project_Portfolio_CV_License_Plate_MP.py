@@ -126,7 +126,7 @@ def preprocess_gray(gray):
     # CLAHE: adaptive histogram equalization for varying illumination
     clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
     enhanced = clahe.apply(denoised)
-    return enhanced
+    return denoised
 
 def ocr_plate(roi_processed):
     """
@@ -146,6 +146,7 @@ def ocr_plate(roi_processed):
 
 
 
+
 #Get basic image
 
 img_path = Path(IMAGES["russian_upclose"])
@@ -161,12 +162,11 @@ else:
         cv2.imshow("Result_roi", roi['roi_gray'])
         cv2.waitKey(0)
 
-        processed_img = preprocess_gray(roi_gray)
-        cv2.imshow("Result_desc", processed_img)
+        desc, angle = deskew_and_align(roi_gray)
+        cv2.imshow("Result_desc", desc)
         cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
-        desc, angle = deskew_and_align(processed_img)
+        desc, angle = deskew_and_align(desc)
         cv2.imshow("Result_desc", desc)
         cv2.waitKey(0)
 
@@ -193,12 +193,11 @@ else:
         cv2.imshow("Result_roi", roi['roi_gray'])
         cv2.waitKey(0)
 
-        processed_img = preprocess_gray(roi_gray)
-        cv2.imshow("Result_desc", processed_img)
+        desc, angle = deskew_and_align(roi_gray)
+        cv2.imshow("Result_desc", desc)
         cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
-        desc, angle = deskew_and_align(processed_img)
+        desc, angle = deskew_and_align(desc)
         cv2.imshow("Result_desc", desc)
         cv2.waitKey(0)
 
@@ -225,12 +224,11 @@ else:
         cv2.imshow("Result_roi", roi['roi_gray'])
         cv2.waitKey(0)
 
-        processed_img = preprocess_gray(roi_gray)
-        cv2.imshow("Result_desc", processed_img)
+        desc, angle = deskew_and_align(roi_gray)
+        cv2.imshow("Result_desc", desc)
         cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
-        desc, angle = deskew_and_align(processed_img)
+        desc, angle = deskew_and_align(desc)
         cv2.imshow("Result_desc", desc)
         cv2.waitKey(0)
 
